@@ -1,0 +1,491 @@
+//!
+//! \page   postproc_page postproc.x Useage
+//!
+//! <h2 class="groupheader">Angular flux commands</h2>
+//!
+//! <table class="memberdecls">
+//! <tr class="memitem:0"><td>
+//!     ./postproc.x
+//!     \ref af_print
+//!     <i>filename</i>
+//! </td></tr>
+//! <tr class="memdesc"><td class="mdescLeft">
+//!     Prints the parameters of an angular flux to \c stdout.
+//! </td></tr>
+//! <tr class="separator"><td class="memSeparator"></td></tr>
+//! <tr class="memitem:0"><td>
+//!     ./postproc.x
+//!     \ref af_plot
+//!     <i>filename</i>
+//! </td></tr>
+//! <tr class="memdesc"><td class="mdescLeft">
+//!     Outputs an angular flux for plotting with gnuplot.
+//! </td></tr>
+//! <tr class="separator"><td class="memSeparator"></td></tr>
+//! <tr class="memitem:0"><td>
+//!     ./postproc.x
+//!     \ref af_norm
+//!     <i>norm filename</i>
+//! </td></tr>
+//! <tr class="memdesc"><td class="mdescLeft">
+//!     Computes and prints the norm(s) of an angular flux.
+//! </td></tr>
+//! <tr class="separator"><td class="memSeparator"></td></tr>
+//! </table>
+//!
+//!
+//! <h2 class="groupheader">Scalar density commands</h2>
+//!
+//! <table class="memberdecls">
+//! <tr class="memitem:0"><td>
+//!     ./postproc.x
+//!     \ref sd_print
+//!     <i>filename</i>
+//! </td></tr>
+//! <tr class="memdesc"><td class="mdescLeft">
+//!     Prints the parameters of a scalar density to \c stdout.
+//! </td></tr>
+//! <tr class="separator"><td class="memSeparator"></td></tr>
+//! <tr class="memitem:0"><td>
+//!     ./postproc.x
+//!     \ref sd_plot
+//!     <i>filename</i>
+//! </td></tr>
+//! <tr class="memdesc"><td class="mdescLeft">
+//!     Outputs a scalar density for plotting with gnuplot.
+//! </td></tr>
+//! <tr class="separator"><td class="memSeparator"></td></tr>
+//! <tr class="memitem:0"><td>
+//!     ./postproc.x
+//!     \ref sd_norm
+//!     <i>filename</i>
+//! </td></tr>
+//! <tr class="memdesc"><td class="mdescLeft">
+//!     Computes and prints the norm(s) of a scalar density.
+//! </td></tr>
+//! <tr class="separator"><td class="memSeparator"></td></tr>
+//! <tr class="memitem:0"><td>
+//!     ./postproc.x
+//!     \ref sd_dist
+//!     <i>norm filename1 filename2</i>
+//! </td></tr>
+//! <tr class="memdesc"><td class="mdescLeft">
+//!     Computes and prints the distance between two scalar densities in the specified norm(s).
+//! </td></tr>
+//! <tr class="separator"><td class="memSeparator"></td></tr>
+//! <tr class="memitem:0"><td>
+//!     ./postproc.x
+//!     \ref sd_convergence
+//!     <i>norm ref_filename file_prefix</i>
+//! </td></tr>
+//! <tr class="memdesc"><td class="mdescLeft">
+//!     Runs a convergence test on scalar densities with prefix _file_prefix_ using _ref_filename_ as the
+//!     reference solution and distances measured using the metric(s) induced by _norm_.
+//! </td></tr>
+//! <tr class="separator"><td class="memSeparator"></td></tr>
+//! <tr class="memitem:0"><td>
+//!     ./postproc.x
+//!     \ref sd_plot_diff
+//!     <i>filename1 filename2</i>
+//! </td></tr>
+//! <tr class="memdesc"><td class="mdescLeft">
+//!     Outputs the difference between two scalar densities for plotting with gnuplot.
+//! </td></tr>
+//! <tr class="separator"><td class="memSeparator"></td></tr>
+//! </table>
+//!
+//!
+//! - - -
+//!
+//! \section af Angular Flux Detail
+//!
+//! <h2 class="groupheader">Basic Information</h2>
+//!
+//! \anchor af_print
+//! <div class="memitem">
+//! <div class="memproto">
+//! <table class="memname">
+//!     <tr>
+//!         <td class="memname">./postproc.x <tt>af_print</tt><td class="paramname">filename</td></td>
+//!     </tr>
+//! </table>
+//! </div>
+//! <div class="memdoc">
+//! Prints the parameters of the angular flux stored in the file _filename_ to \c stdout.
+//! <dl class="params"><dt>Arguments</dt><dd>
+//!     <table class="params">
+//!         <tr>
+//!             <td class="paramname">filename</td>
+//!             <td>Name of file containing angular flux to print parameters of.</td>
+//!         </tr>
+//!     </table>
+//! </dd></dl>
+//! </div>
+//! </div>
+//!
+//! \anchor af_plot
+//! <div class="memitem">
+//! <div class="memproto">
+//! <table class="memname">
+//!     <tr>
+//!         <td class="memname">./postproc.x <tt>af_plot</tt><td class="paramname">filename</td></td>
+//!     </tr>
+//! </table>
+//! </div>
+//! <div class="memdoc">
+//! Outputs the scalar flux obtained from the angular flux stored in the file _filename_ for plotting with
+//! gnuplot.
+//! Plot data is output to the file '_idc.out_' for 1D code, and '_heatmap.out_' for 2D code.
+//! <dl class="params"><dt>Arguments</dt><dd>
+//!     <table class="params">
+//!         <tr>
+//!             <td class="paramname">filename</td>
+//!             <td>Name of file containing angular flux to plot.</td>
+//!         </tr>
+//!     </table>
+//! </dd></dl>
+//! </div>
+//! </div>
+//!
+//! <h2 class="groupheader">Norms and Distances</h2>
+//!
+//! \anchor af_norm
+//! <div class="memitem">
+//! <div class="memproto">
+//! <table class="memname">
+//!     <tr>
+//!         <td class="memname">./postproc.x <tt>af_norm</tt><td class="paramname">norm filename</td></td>
+//!     </tr>
+//! </table>
+//! </div>
+//! <div class="memdoc">
+//! Computes and prints the norm(s) specified by _norm_ for the angular flux stored in the file _filename_.
+//! Valid values for _norm_ are given in the table below.
+//! <dl class="params"><dt>Arguments</dt><dd>
+//!     <table class="params">
+//!         <tr>
+//!             <td class="paramname">norm</td>
+//!             <td>Specifier for norm(s) to compute. See table below for valid specifiers.</td>
+//!         </tr>
+//!         <tr>
+//!             <td class="paramname">filename</td>
+//!             <td>Name of file containing angular flux to compute norm(s) of.</td>
+//!         </tr>
+//!     </table>
+//! </dd></dl>
+//! <table class="fieldtable">
+//! <caption>Angular flux norm specifiers</caption>
+//!     <tr>
+//!         <th>Norm Specifier</th>
+//!         <th>Description</th>
+//!         <th>Computed By</th>
+//!     </tr>
+//!     <tr>
+//!         <td><i>l1</i></td>
+//!         <td>\f$ \ell_1 \f$ norm of the DG coefficient array.</td>
+//!         <td>AF_norml1()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>l2</i></td>
+//!         <td>\f$ \ell_2 \f$ norm of the DG coefficient array.</td>
+//!         <td>AF_norml2()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>linf</i></td>
+//!         <td>\f$ \ell_{\infty} \f$ norm of the DG coefficient array.</td>
+//!         <td>AF_normlinf()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>L1</i></td>
+//!         <td>\f$ L^1( d\vec{x} \, d\vec{\Omega} ) \f$ norm of the finite element solution.</td>
+//!         <td>AF_normL1()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>L2</i></td>
+//!         <td>\f$ L^2( d\vec{x} \, d\vec{\Omega} ) \f$ norm of the finite element solution.</td>
+//!         <td>AF_normL2()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>Linf</i></td>
+//!         <td>\f$ L^{\infty}( d\vec{x} \, d\vec{\Omega} ) \f$ norm of the finite element solution.</td>
+//!         <td>AF_normLinf()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>all</i></td>
+//!         <td>All six of the above norms.</td>
+//!         <td></td>
+//!     </tr>
+//! </table>
+//! </div>
+//! </div>
+//!
+//! - - -
+//!
+//! \section sd Scalar Density Detail
+//!
+//! <h2 class="groupheader">Basic Information</h2>
+//!
+//! \anchor sd_print
+//! <div class="memitem">
+//! <div class="memproto">
+//! <table class="memname">
+//!     <tr>
+//!         <td class="memname">./postproc.x <tt>sd_print</tt><td class="paramname">filename</td></td>
+//!     </tr>
+//! </table>
+//! </div>
+//! <div class="memdoc">
+//! Prints the parameters of the scalar density stored in the file _filename_ to stdout.
+//! <dl class="params"><dt>Arguments</dt><dd>
+//!     <table class="params">
+//!         <tr>
+//!             <td class="paramname">filename</td>
+//!             <td>Name of file containing scalar density to print parameters of.</td>
+//!         </tr>
+//!     </table>
+//! </dd></dl>
+//! </div>
+//! </div>
+//!
+//! \anchor sd_plot
+//! <div class="memitem">
+//! <div class="memproto">
+//! <table class="memname">
+//!     <tr>
+//!         <td class="memname">./postproc.x <tt>sd_plot</tt><td class="paramname">filename</td></td>
+//!     </tr>
+//! </table>
+//! </div>
+//! <div class="memdoc">
+//! Outputs the scalar density stored in the file _filename_ for plotting with gnuplot.
+//! Plot data is output to the file '_idc.out_' for 1D code, and '_heatmap.out_' for 2D code.
+//! <dl class="params"><dt>Arguments</dt><dd>
+//!     <table class="params">
+//!         <tr>
+//!             <td class="paramname">filename</td>
+//!             <td>Name of file containing scalar density to plot.</td>
+//!         </tr>
+//!     </table>
+//! </dd></dl>
+//! </div>
+//! </div>
+//!
+//! <h2 class="groupheader">Norms and Distances</h2>
+//!
+//! \anchor sd_norm
+//! <div class="memitem">
+//! <div class="memproto">
+//! <table class="memname">
+//!     <tr>
+//!         <td class="memname">./postproc.x <tt>sd_norm</tt><td class="paramname">norm filename</td></td>
+//!     </tr>
+//! </table>
+//! </div>
+//! <div class="memdoc">
+//! Computes and prints the norm(s) specified by _norm_ for the scalar density stored in the file _filename_.
+//! Valid values for _norm_ are given in the table below.
+//! <dl class="params"><dt>Arguments</dt><dd>
+//!     <table class="params">
+//!         <tr>
+//!             <td class="paramname">norm</td>
+//!             <td>Specifier for norm(s) to compute. See table below for valid specifiers.</td>
+//!         </tr>
+//!         <tr>
+//!             <td class="paramname">filename</td>
+//!             <td>Name of file containing scalar density to compute norm(s) of.</td>
+//!         </tr>
+//!     </table>
+//! </dd></dl>
+//! <table class="fieldtable">
+//! <caption>Angular flux norm specifiers</caption>
+//!     <tr>
+//!         <th>Norm Specifier</th>
+//!         <th>Description</th>
+//!         <th>Computed By</th>
+//!     </tr>
+//!     <tr>
+//!         <td><i>l1</i></td>
+//!         <td>\f$ \ell_1 \f$ norm of the DG coefficient array.</td>
+//!         <td>SD_norml1()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>l2</i></td>
+//!         <td>\f$ \ell_2 \f$ norm of the DG coefficient array.</td>
+//!         <td>SD_norml2()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>linf</i></td>
+//!         <td>\f$ \ell_{\infty} \f$ norm of the DG coefficient array.</td>
+//!         <td>SD_normlinf()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>L1</i></td>
+//!         <td>\f$ L^1( d\vec{x} ) \f$ norm of the finite element solution.</td>
+//!         <td>SD_normL1()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>L2</i></td>
+//!         <td>\f$ L^2( d\vec{x} ) \f$ norm of the finite element solution.</td>
+//!         <td>SD_normL2()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>Linf</i></td>
+//!         <td>\f$ L^{\infty}( d\vec{x} ) \f$ norm of the finite element solution.</td>
+//!         <td>SD_normLinf()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>all</i></td>
+//!         <td>All six of the above norms.</td>
+//!         <td></td>
+//!     </tr>
+//! </table>
+//! </div>
+//! </div>
+//!
+//! \anchor sd_dist
+//! <div class="memitem">
+//! <div class="memproto">
+//! <table class="memname">
+//!     <tr>
+//!         <td class="memname">./postproc.x <tt>sd_dist</tt><td class="paramname">norm filename1 filename2</td></td>
+//!     </tr>
+//! </table>
+//! </div>
+//! <div class="memdoc">
+//! Computes and prints the distance between the scalar densities stored in _filename1_ and _filename2_ in the specified norm(s).
+//! Valid values for _norm_ are given in the table below.
+//! <dl class="params"><dt>Arguments</dt><dd>
+//!     <table class="params">
+//!         <tr>
+//!             <td class="paramname">norm</td>
+//!             <td>Specifier for norm(s) to compute. See table below for valid specifiers.</td>
+//!         </tr>
+//!         <tr>
+//!             <td class="paramname">filename1</td>
+//!             <td>Name of file containing first scalar density in distance.</td>
+//!         </tr>
+//!         <tr>
+//!             <td class="paramname">filename2</td>
+//!             <td>Name of file containing second scalar density in distance.</td>
+//!         </tr>
+//!     </table>
+//! </dd></dl>
+//! <table class="fieldtable">
+//! <caption>Angular flux norm specifiers</caption>
+//!     <tr>
+//!         <th>Norm Specifier</th>
+//!         <th>Description</th>
+//!         <th>Computed By</th>
+//!     </tr>
+//!     <tr>
+//!         <td><i>L1</i></td>
+//!         <td>\f$ L^1( d\vec{x} ) \f$ norm of the finite element solution.</td>
+//!         <td>SD_normL1()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>L2</i></td>
+//!         <td>\f$ L^2( d\vec{x} ) \f$ norm of the finite element solution.</td>
+//!         <td>SD_normL2()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>Linf</i></td>
+//!         <td>\f$ L^{\infty}( d\vec{x} ) \f$ norm of the finite element solution.</td>
+//!         <td>SD_normLinf()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>all</i></td>
+//!         <td>All three of the above norms.</td>
+//!         <td></td>
+//!     </tr>
+//! </table>
+//! </div>
+//! </div>
+//!
+//! \anchor sd_convergence
+//! <div class="memitem">
+//! <div class="memproto">
+//! <table class="memname">
+//!     <tr>
+//!         <td class="memname">./postproc.x <tt>sd_convergence</tt><td class="paramname">norm ref_filename file_prefix</td></td>
+//!     </tr>
+//! </table>
+//! </div>
+//! <div class="memdoc">
+//! Runs a convergence test using the scalar density contained in _ref_filename_ as the reference solution and
+//! distances measured using the metric(s) induced by _norm_.
+//! The files used for the test are determined by searching for all files with valid extensions (.sd{1,2,3})
+//! whose prefix matches _file_prefix_.
+//! <dl class="params"><dt>Arguments</dt><dd>
+//!     <table class="params">
+//!         <tr>
+//!             <td class="paramname">norm</td>
+//!             <td>Specifier for norm(s) with which to compute distances. See table below for valid specifiers.</td>
+//!         </tr>
+//!         <tr>
+//!             <td class="paramname">ref_filename</td>
+//!             <td>Name of file containing scalar density to use as the reference solution.</td>
+//!         </tr>
+//!         <tr>
+//!             <td class="paramname">file_prefix</td>
+//!             <td>Filename prefix used to search for scalar density files to use for the convergence test.</td>
+//!         </tr>
+//!     </table>
+//! </dd></dl>
+//! <table class="fieldtable">
+//! <caption>Angular flux norm specifiers</caption>
+//!     <tr>
+//!         <th>Norm Specifier</th>
+//!         <th>Description</th>
+//!         <th>Computed By</th>
+//!     </tr>
+//!     <tr>
+//!         <td><i>L1</i></td>
+//!         <td>\f$ L^1( d\vec{x} ) \f$ norm of the finite element solution.</td>
+//!         <td>SD_normL1()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>L2</i></td>
+//!         <td>\f$ L^2( d\vec{x} ) \f$ norm of the finite element solution.</td>
+//!         <td>SD_normL2()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>Linf</i></td>
+//!         <td>\f$ L^{\infty}( d\vec{x} ) \f$ norm of the finite element solution.</td>
+//!         <td>SD_normLinf()</td>
+//!     </tr>
+//!     <tr>
+//!         <td><i>all</i></td>
+//!         <td>All three of the above norms.</td>
+//!         <td></td>
+//!     </tr>
+//! </table>
+//! </div>
+//! </div>
+//!
+//! \anchor sd_plot_diff
+//! <div class="memitem">
+//! <div class="memproto">
+//! <table class="memname">
+//!     <tr>
+//!         <td class="memname">./postproc.x <tt>sd_plot_diff</tt><td class="paramname">filename1 filename2</td></td>
+//!     </tr>
+//! </table>
+//! </div>
+//! <div class="memdoc">
+//! Outputs the difference between the scalar densities stored in _filename1_ and _filename2_ for plotting with gnuplot.
+//! Plot data is output to the file '_idc.out_' for 1D code, and '_heatmap.out_' for 2D code.
+//! <dl class="params"><dt>Arguments</dt><dd>
+//!     <table class="params">
+//!         <tr>
+//!             <td class="paramname">filename1</td>
+//!             <td>First scalar density in difference.</td>
+//!         </tr>
+//!         <tr>
+//!             <td class="paramname">filename2</td>
+//!             <td>Second scalar density in difference.</td>
+//!         </tr>
+//!     </table>
+//! </dd></dl>
+//! </div>
+//! </div>
+//!

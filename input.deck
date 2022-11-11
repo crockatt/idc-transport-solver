@@ -1,0 +1,188 @@
+
+# --- Spatial discretization. ------------------------- #
+
+ax              0.000000
+bx              4.000000
+nx              224
+
+ay              0.000000
+by              4.000000
+ny              224
+
+az              -4.000000
+bz              4.000000
+nz              56
+
+num_mpi_blocks_x 2
+num_mpi_blocks_y 2
+num_mpi_blocks_z 1
+
+dg_degree       1
+# dg_degree_x     6
+# dg_degree_t     1
+
+piecewise_cross true
+periodic        false
+# reflect_x_min   true
+# reflect_y_min   true
+
+
+# --- Time integrator configuration. ------------------ #
+
+time_integrator     stdg
+checkpoint_steps    0
+
+### IDC method
+
+idc_type            update
+idc_use_collocation false
+
+#idc_nodes_type     gauss-legendre
+#idc_nodes_type     gauss-lobatto
+idc_nodes_type     gauss-radau
+#idc_nodes_type     chebyshev
+#idc_nodes_type     chebyshev-radau
+#idc_nodes_type     equispaced-right
+#idc_nodes_type     equispaced-both
+
+idc_num_nodes   2
+idc_num_corr    2
+
+### DIRK method
+
+# dirk_method     euler
+#dirk_method     sdirk2
+dirk_method     sdirk3
+#dirk_method     sdirk5
+#dirk_method     sdirk-5-3-4
+#dirk_method     ark-8-4-5
+#dirk_method     kvaerno-4-2-3
+#dirk_method     kvaerno-7-4-5
+#dirk_method     gsbp-dirk-3
+#dirk_method     gsbp-dirk-4
+
+### ERK method
+
+erk_method      rk4
+
+# --- Initial condition configuration. ---------------- #
+
+sigma_val       0.0
+moll_radius     0.0
+bump_radius     1.0
+epsilon         1.0
+alpha           1.0
+
+### Smooth bump
+
+# problem         bump
+# tfinal          0.0
+# cfl             256.0
+
+### 1D -- Reed's problem.
+
+# problem     reeds-problem
+# tfinal      10.0
+# cfl         8.0
+#cfl         0.1
+
+### Lattice
+
+problem         lattice
+
+tfinal          3.2e+0
+cfl             2.56e+1
+
+### 2D - Hohlraum
+
+# problem         hohlraum2
+# tfinal          2.6
+# cfl             104.0
+#cfl             0.05
+
+### Radiating sphere
+
+# problem     inhomogeneous-sphere
+# sphere_inner_radius 1.0
+# sphere_outer_radius 3.0
+# sphere_inner_trans_radius 1.8
+# sphere_outer_trans_radius 0.0
+# sphere_inner_sigma_val 100.0
+# sphere_interm_sigma_val 10.0
+# sphere_outer_sigma_val 0.0
+# tfinal  8.0
+# cfl     128.0
+
+# problem     inhomogeneous-sphere
+# sphere_inner_radius 1.0
+# sphere_inner_sigma_val 10.0
+# sphere_inner_transition_radius 0.0
+# sphere_inter_sigma_val 0.0
+# sphere_outer_radius 1.0
+# sphere_outer_sigma_val 0.0
+# sphere_outer_transition_radius 0.0
+# tfinal  8.0
+# cfl     128.0
+
+# --- Output options. --------------------------------- #
+
+output_af       false
+output_sd       true
+output_plot     true
+output_mem      true
+output_log      true
+output_init     false
+output_steps    false
+
+# --- Hybrid configuration. --------------------------- #
+
+ordinate_sym_reduce true
+
+ordinate_type   spherical-triangle
+ang_order       16
+
+u_ordinate_type spherical-triangle
+u_ang_order     2
+
+c_ordinate_type spherical-triangle
+c_ang_order     2
+
+# hybrid_method   none
+# hybrid_method  hybrid-ia
+hybrid_method  hybrid-c
+# hybrid_method  hybrid-iia
+# hybrid_method  hybrid-iic
+
+relabel         true
+relabel_type    pwc-hierarchical
+relabel_blas_op none
+
+# Common solver configuration.
+solve_type      petsc-peierls-gmres
+rtol            1e-60
+abs_tol         1e-8
+dtol            1e8
+max_its         5000
+gmres_restart   100
+
+# Solver defaults.
+sweep_solve     gaussian-elimination
+sweep_pattern   kba2
+kba_block_size  8
+
+# High-resolution solver overrides.
+# u_sweep_solve       gaussian-elimination
+# u_sweep_pattern     kba2
+# u_kba_block_size    2
+
+# Low-resolution solver overrides.
+# c_sweep_solve       simd-gaussian-elimination
+# c_sweep_pattern     kba2
+# c_kba_block_size    8
+
+# DSA configuration
+use_dsa         false
+dsa_rtol        1e-60
+dsa_abs_tol     1e-12
+dsa_dtol        1e12
+dsa_max_its     2000

@@ -1,0 +1,611 @@
+/**
+
+\page   solver_page solver.x
+
+<h1 class="ex_use_h1">Overview</h1>
+
+The \c solver.x executable runs transport simulations based on specifications loaded from a plain-text
+configuration file.
+The program is executed using a command of the form
+
+<code>
+    ./solver.x [CONFIG FILE] [PETSc OPTIONS]
+</code>
+
+<dl class="parameter_list">
+    <dt><tt>[CONFIG FILE]</tt></dt>
+    <dd>
+        Name of configuration file to use. If none is provided, then the default is \e "input.deck".
+    </dd>
+
+    <dt><tt>[PETSc OPTIONS]</tt></dt>
+    <dd>
+        Switches for controlling
+        <a href="http://www.mcs.anl.gov/petsc/petsc-current/docs/">PETSc configuration options</a>.
+        If any such switches are used, the configuration file <tt>[CONFIG FILE]</tt> must be explicitly
+        specified before any PETSc options are given.
+    </dd>
+</dl>
+
+
+<h1 class="ex_use_h1">Compilation</h1>
+
+A makefile is provided to facilitate compilation of executables.
+The file \e make.inc should be created in the top-level directory containing definitions of variables used in
+the compilation process.
+Each makefile will "include" the file \e make.inc in order to utilize these configuration variables.
+Several examples of different \e make.inc configurations can be found in the \e make subdirectory.
+The make variables which should be defined in the file \e make.inc are as follows:
+
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="ex_use_h2">
+    Make variables
+</h2></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">MAKE</td>
+    <td class="inputItemRight" valign="bottom">Path to make executable.</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">CC</td>
+    <td class="inputItemRight" valign="bottom">Path to C compiler executable.</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">CXX</td>
+    <td class="inputItemRight" valign="bottom">Path to C++ compiler executable.</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">CFLAGS</td>
+    <td class="inputItemRight" valign="bottom">Compilation flags passed to C compiler.</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">CXXFLAGS</td>
+    <td class="inputItemRight" valign="bottom">Compilation flags passed to C++ compiler.</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">ALLFLAGS</td>
+    <td class="inputItemRight" valign="bottom">Configuration flags passed to all compilers.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">A list of configuration options which can be defined here as preprocessor macros can be found in defines.h.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">OPTFLAGS</td>
+    <td class="inputItemRight" valign="bottom">Optimization flags passed to all compilers.</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">LIB</td>
+    <td class="inputItemRight" valign="bottom">Library flags passed to all compilers.</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">INCLUDE</td>
+    <td class="inputItemRight" valign="bottom">Include paths passed to all compilers.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Should contain at least <tt>"-I ./src/"</tt> and <tt>"-I ../"</tt>.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+</table>
+
+
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="ex_use_h2">
+    Make targets
+</h2></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">all</td>
+    <td class="inputItemRight" valign="bottom">(default) Alias for \c "make solver" followed by \c "make postproc".</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">solver</td>
+    <td class="inputItemRight" valign="bottom">Compiles the transport solver executable \c "solver.x".</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">postproc</td>
+    <td class="inputItemRight" valign="bottom">Compiles the postprocessing utility \c "postproc.x".</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">clean</td>
+    <td class="inputItemRight" valign="bottom">Removes all executables (<tt>rm *.x</tt>).</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">cleanall</td>
+    <td class="inputItemRight" valign="bottom">Removes all executables, output files, and compiled documentation files.</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">doxygen</td>
+    <td class="inputItemRight" valign="bottom">Compiles this documentation.</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">plot1</td>
+    <td class="inputItemRight" valign="bottom">Plots and displays the result of a 1D run using gnuplot and eom (eye of mate).</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">plot2</td>
+    <td class="inputItemRight" valign="bottom">Plots and displays the result of a 2D run using gnuplot and eom (eye of mate).</td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+</table>
+
+
+<h1 class="ex_use_h1">Configuration files</h1>
+
+The configuration files are read by the #inputList_t object implementation.
+The structure of the configuration files is as follows:
+    - Files are whitespace delimited into \e tokens.
+    - The first two tokens of each line form a \e key, \e value pair (in that order).
+      The \e key specifies the parameter to be set and the \e value indicates how that parameter should
+      be set.
+    - Reading of both \e keys and \e values is case insensitive.
+    - Any additional tokens on a line following the \e key, \e value pair are ignored.
+    - Single-line comments are facilitated using the "#" character. If this character is encountered at
+      the beginning of any token, the remainder of that line is ignored.
+    - If a line contains only one token, that token names a \e key whose corresponding \e value is an empty
+      string.
+    - Keys may appear in any order.
+    - If a key is specified more than once, the behavior of \c solver.x is undefined.
+    - Empty lines are ignored.
+
+Valid \e keys used by \c solver.x are given below.
+Note that if \c solver.x expects a \e key to be provided and it is not, then a default zero or null value
+is assumed (except in some cases where overrides are specified).
+
+
+<h1 class="ex_use_h1" style="margin-bottom:0">Valid input keys</h1>
+
+
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="ex_use_h2">
+    Spatial discretization
+</h2></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">ax<br />ay<br />az</td>
+    <td class="inputItemRight" valign="bottom">Decimal floating point values.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specify the lower bounds on the coordinates for each spatial dimension.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">bx<br />by<br />bz</td>
+    <td class="inputItemRight" valign="bottom">Decimal floating point values.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specify the upper bounds on the coordinates for each spatial dimension.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">nx<br />ny<br />nz</td>
+    <td class="inputItemRight" valign="bottom">Positive integer values.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specify the number of finite element cells which will be used to subdivide the spatial domain in each dimension.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">mpi_num_blocks_x<br />mpi_num_blocks_y<br />mpi_num_blocks_z</td>
+    <td class="inputItemRight" valign="bottom">Positive integer values.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specify the number of subdomains in each dimension for domain decomposition amongst MPI ranks.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Each subdomain is assigned a grid of spatial cells speciefied by <b><tt>nx</tt></b>, <b><tt>ny</tt></b>, <b><tt>nz</tt></b>. That is, the total number of spatial cells used across all MPI ranks in, for example, the \f$ x \f$-dimension is (<b><tt>mpi_num_blocks_x</tt></b>) * (<b><tt>nx</tt></b>).<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Only used if the preprocessor macro \c #ENABLE_MPI is defined during compilation.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">dg_order</td>
+    <td class="inputItemRight" valign="bottom">Nonnegative integer value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the maximum polynomial degree to use within the DG spatial discretization.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">piecewise_cross</td>
+    <td class="inputItemRight" valign="bottom">Boolean value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies whether or not the material cross-sections \f$ \sigma_{\mathrm{t}} \f$ and \f$ \sigma_{\mathrm{s}} \f$ should be treated using a piecewise constant approximation.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">If \e true, then the cross-sections are assumed to be constant on each spatial cell.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">If \e false, then the cross-sections are approximated using a DG expansion of the same degree as the angular flux.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+</table>
+
+
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="ex_use_h2">
+    Time integrators
+</h2></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">int_class</td>
+    <td class="inputItemRight" valign="bottom">String descriptor of #integratorClass_t.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the class of time integrator to use (e.g., BE-IDC, DIRK, etc.).<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">idc_nodeset</td>
+    <td class="inputItemRight" valign="bottom">String descriptor of #nodeSet_t.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the type of quadrature nodes to use within an IDC integrator.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">idc_pts</td>
+    <td class="inputItemRight" valign="bottom">Positive integer value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the number of nodes of the given type to use within an IDC integrator.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">idc_corr</td>
+    <td class="inputItemRight" valign="bottom">Nonnegative integer value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the number of correction iterations to apply within an IDC integrator.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">dirk_method</td>
+    <td class="inputItemRight" valign="bottom">String descriptor of #dirk_t.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the specific DIRK method to use for time integration.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">erk_method</td>
+    <td class="inputItemRight" valign="bottom">String descriptor of #erk_t.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the specific ERK method to use for time integration.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+</table>
+
+
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="ex_use_h2">
+    Angular discretization
+</h2></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">ordinate_set</td>
+    <td class="inputItemRight" valign="bottom">...</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight"><br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">high_quad</td>
+    <td class="inputItemRight" valign="bottom">Positive, even integer value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">For nonhybrid methods, specifies the order of the discrete ordinate quadrature to use.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">For hybrid methods, specifies the order of discrete ordinate quadrature to use for the uncollided component.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">low_quad</td>
+    <td class="inputItemRight" valign="bottom">Positive, even integer value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the order of discrete ordinate quadrature to use for the collided component.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">hybrid_method</td>
+    <td class="inputItemRight" valign="bottom">String descriptor of #hybrid_t.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the type of hybrid splitting (if any) to use within the time integrator.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+</table>
+
+\todo Implement \c ordinate_set option.
+\todo Change \c *_quad to something like \c *_ordinates?
+
+
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="ex_use_h2">
+    Problem and initial condition
+</h2></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">init_cond</td>
+    <td class="inputItemRight" valign="bottom">String descriptor of #initialCondition_t.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the setup of the problem to run (cross-sections, sources, initial flux, etc.).<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">moll_radius</td>
+    <td class="inputItemRight" valign="bottom">Nonnegative decimal floating point value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the radius of the mollifier to use for smoothing the problem conditions.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescSee">\see mollifier()<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">bump_radius</td>
+    <td class="inputItemRight" valign="bottom">Positive decimal floating point value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the radius of the support for the initial flux used by the \c #INITIAL_CONDITION_BUMP #initialCondition_t.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">sigma_val</td>
+    <td class="inputItemRight" valign="bottom">Positive decimal floating point value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the constant cross-section value used by the \c #INITIAL_CONDITION_BUMP #initialCondition_t.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">tfinal</td>
+    <td class="inputItemRight" valign="bottom">Nonnegative decimal floating point value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the final time the simulation should run to (assuming that the initial time is zero).<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">cfl</td>
+    <td class="inputItemRight" valign="bottom">Positive floating point value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the CFL ratio \f$ \Delta t / \Delta x \f$.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">This parameter, together with the spatial width \f$ \Delta x \f$ (as computed from <b><tt>ax</tt></b>, <b><tt>bx</tt></b>, and <b><tt>nx</tt></b>) determines the timestep size \f$ \Delta t \f$.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+</table>
+
+
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="ex_use_h2">
+    Solver configuration
+</h2></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">solver_type</td>
+    <td class="inputItemRight" valign="bottom">String descriptor of #solverType_t.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the type of linear solver to use when computing solutions of the transport system.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">sweep_type</td>
+    <td class="inputItemRight" valign="bottom">String descriptor of #sweepType_t.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the algorithm used to compute transport sweeps.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">rtol</td>
+    <td class="inputItemRight" valign="bottom">Positive decimal floating point value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the relative tolerance to use for determining convergence of iterative solvers.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Only used for the \c #SOLVER_GMRES solver.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">abstol</td>
+    <td class="inputItemRight" valign="bottom">Positive decimal floating point value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the absolute tolerance to use for determining convergence of iterative solvers.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Used for \c #SOLVER_SOURCE_ITERATION and \c #SOLVER_GMRES solvers.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">dtol</td>
+    <td class="inputItemRight" valign="bottom">Positive decimal floating point value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the absolute tolerance to use for determining divergence of iterative solvers.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Only used for the \c #SOLVER_GMRES solver.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">max_its</td>
+    <td class="inputItemRight" valign="bottom">Positive integer value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the maximum number of iterations used in each iterative solve.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Used for \c #SOLVER_SOURCE_ITERATION and \c #SOLVER_GMRES solvers.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">gmres_restart</td>
+    <td class="inputItemRight" valign="bottom">Positive integer value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies the number of iterations between restarts of the GMRES iterative solver.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Only used for the \c #SOLVER_GMRES solver.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">If no value is specified the PETSc default (30 iterations in the current version) is left unchanged.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+</table>
+
+
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="ex_use_h2">
+    Output
+</h2></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">output_af</td>
+    <td class="inputItemRight" valign="bottom">Boolean value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies whether the angular flux computed at the final time of the simulation should be output to a binary file.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">If \e true, then the angular flux object is written to a binary file with extension \e af1, \e af2, or \e af3 depending on the number of spatial dimensions used.<br /></td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescSee">\see AF_writeToDisk()<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">output_sd</td>
+    <td class="inputItemRight" valign="bottom">Boolean value.</td>
+</tr>
+<tr class="memdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies whether the scalar flux computed at the final time of the simulation should be output to a binary file.<br /></td>
+</tr>
+<tr class="inputdesc">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">If \e true, then the scalar density object is written to a binary file with extension \e sd1, \e sd2, or \e sd3 depending on the number of spatial dimensions used.<br /></td>
+</tr>
+<tr class="inputdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescSee">\see SD_writeToDisk()<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">output_plot</td>
+    <td class="inputItemRight" valign="bottom">Boolean value.</td>
+</tr>
+<tr class="inputdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies whether a grid of sample points should be output to a plaintext file for plotting with, e.g., <a href="http://www.gnuplot.info/">gnuplot</a>.<br /></td>
+</tr>
+<tr class="inputdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">If \e true, then the scalar flux computed at the final time of the simulation is sampled on a grid of points and the point values are written to a plaintext file with name \e idc.out, \e heatmap.out, or \e volume.out depending on the number of spatial dimensions used.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">output_mem</td>
+    <td class="inputItemRight" valign="bottom">Boolean value.</td>
+</tr>
+<tr class="inputdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies whether the maximum memory usage of the process as recorded by the linux kernel should be determined from kernel interfaces and printed to \c stdout (and log file if enabled).<br /></td>
+</tr>
+<tr class="inputdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">The maximum memory usage is determined by reading the value VmHWM from "/proc/<pid>/status" before terminating execution.<br /></td>
+</tr>
+<tr class="inputdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Only works when compiled and run on a system using a linux kernel.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+<tr class="memitem:0">
+    <td class="inputItemLeft" align="right" valign="top">output_log</td>
+    <td class="inputItemRight" valign="bottom">Boolean value.</td>
+</tr>
+<tr class="inputdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">Specifies whether configuration, status, error, etc. messages should be written to a plaintext file in addition to \c stdout/stderr.<br /></td>
+</tr>
+<tr class="inputdesc:0">
+    <td class="inputDescLeft"></td>
+    <td class="inputDescRight">If \e true, then all messages written to \c stdout/stderr are also written to a plaintext file with extension \e log.<br /></td>
+</tr>
+<tr class="separator:0"><td class="memSeparator" colspan="2"></td></tr>
+</table>
+
+
+<h1 class="ex_use_h1" style="margin-bottom:0">Environment variables</h1>
+
+
+*/

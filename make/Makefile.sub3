@@ -1,0 +1,60 @@
+#-------------------------------------------------------------------------------------------------------------
+# Makefile
+#-------------------------------------------------------------------------------------------------------------
+
+include ../../../../$(INC)
+
+CFILES   := $(wildcard *.c)
+CXXFILES := $(wildcard *.cpp)
+CUFILES  := $(wildcard *.cu)
+
+ifdef use_cuda
+	OBJFILES_1D := $(notdir $(CFILES:.c=.o1) $(CXXFILES:.cpp=.o1) $(CUFILES:.cu=.o1))
+	OBJFILES_2D := $(notdir $(CFILES:.c=.o2) $(CXXFILES:.cpp=.o2) $(CUFILES:.cu=.o2))
+else
+	OBJFILES_1D := $(notdir $(CFILES:.c=.o1) $(CXXFILES:.cpp=.o1))
+	OBJFILES_2D := $(notdir $(CFILES:.c=.o2) $(CXXFILES:.cpp=.o2))
+endif
+
+SHFILES := $(wildcard *.sh)
+HFILES  := $(SHFILES:.sh=.shh)
+
+all: $(OBJFILES_1D) $(OBJFILES_2D) $(HFILES)
+
+clean:
+	-rm *.o? *.shh
+	-rm Makefile
+
+# 1D
+%.o1: %.c
+	$(CC) -c -o $@ $< \
+	$(ALLFLAGS) $(CONFIGFLAGS_1D) $(OPTFLAGS) $(CFLAGS) \
+	$(LIB) $(INCLUDE)
+
+%.o1: %.cpp
+	$(CXX) -c -o $@ $< \
+	$(ALLFLAGS) $(CONFIGFLAGS_1D) $(OPTFLAGS) $(CXXFLAGS) \
+	$(LIB) $(INCLUDE)
+
+%.o1: %.cu
+	$(CCU) $(CUFLAGS) $(CONFIGFLAGS_1D) -c -o $@ $< \
+	$(CUDALIB) $(INCLUDE)
+
+# 2D
+%.o2: %.c
+	$(CC) -c -o $@ $< \
+	$(ALLFLAGS) $(CONFIGFLAGS_2D) $(OPTFLAGS) $(CFLAGS) \
+	$(LIB) $(INCLUDE)
+
+%.o2: %.cpp
+	$(CXX) -c -o $@ $< \
+	$(ALLFLAGS) $(CONFIGFLAGS_2D) $(OPTFLAGS) $(CXXFLAGS) \
+	$(LIB) $(INCLUDE)
+
+%.o2: %.cu
+	$(CCU) $(CUFLAGS) $(CONFIGFLAGS_2D) -c -o $@ $< \
+	$(CUDALIB) $(INCLUDE)
+
+# Convert script templates into headers containing C-style string declarations.
+%.shh: %.sh
+	xxd -i $< > $@

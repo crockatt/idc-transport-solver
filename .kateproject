@@ -1,0 +1,5 @@
+{
+    "name": "Solver"
+,   "files": [ { "directory": ".", "filters": [ "*.c", "*.cpp", "*.h", "*.hpp", "make*", "*.inc", "*.deck", "*.sh" ], "recursive": 1 } ]
+,   "build": { "build": "make -j", "clean": "make -j clean" }
+}
