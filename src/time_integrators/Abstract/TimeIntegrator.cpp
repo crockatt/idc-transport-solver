@@ -251,7 +251,7 @@ TimeIntegrator & TimeIntegrator::Integrate (
 
     // Output initial condition if desired.
     if ( this->output_steps )
-        OutputSolution( initial_condition, nullptr );
+        OutputSolution( initial_condition, nullptr, true );
 
     // Compute number of steps.
     double current_step_size = max_step_size;
@@ -283,7 +283,7 @@ TimeIntegrator & TimeIntegrator::Integrate (
 
         // Output solution if desired.
         if ( this->output_steps )
-            OutputSolution( initial_condition, nullptr );
+            OutputSolution( initial_condition, nullptr, true );
     }
 
     solve_time.Stop();
@@ -364,7 +364,7 @@ TimeIntegrator & TimeIntegrator::Integrate (
 
     // Output initial condition if desired.
     if ( this->output_steps )
-        OutputSolution( u_initial_condition, c_initial_condition );
+        OutputSolution( u_initial_condition, c_initial_condition, true );
 
     // Compute number of steps.
     double current_step_size = max_step_size;
@@ -394,7 +394,7 @@ TimeIntegrator & TimeIntegrator::Integrate (
 
         // Output solution if desired.
         if ( this->output_steps )
-            OutputSolution( u_initial_condition, c_initial_condition );
+            OutputSolution( u_initial_condition, c_initial_condition, true );
 
         // Write checkpoint and exit if necessary. Need to stop the time so that we get the correct estimate
         // from CheckWalltimeCheckpoint.
