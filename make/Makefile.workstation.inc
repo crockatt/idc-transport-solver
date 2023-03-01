@@ -26,6 +26,7 @@ CONFIGFLAGS_2D := -DSPACE_DIMS=2
 ALLFLAGS := -Wall -Wextra -Wshadow -Wpedantic \
             -DCOLOR_TERM -DLOGLEVEL=1 \
             -DENABLE_HWLOC -DUSE_HWLOC_ALLOC -DUSE_ALIGNED_ALLOC \
+            -DENABLE_PETSC \
             -DENABLE_SIMD_BLOCKING -DSIMD_LEN=16
 OPTFLAGS := -O3 -march=native -fopenmp -fopenmp-simd -fdiagnostics-color
 
