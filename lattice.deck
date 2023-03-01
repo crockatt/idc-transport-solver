@@ -1,0 +1,43 @@
+
+ax  0.0
+bx  7.0
+ay  0.0
+by  7.0
+
+nx  224
+ny  224
+
+dg_degree 2
+piecewise_cross true
+
+problem         lattice
+tfinal          3.2e+0
+cfl             2.56e+1
+moll_radius     0.0
+
+time_integrator dirk
+dirk_method     sdirk3
+
+ordinate_type       spherical-triangle
+ang_order           8
+ordinate_sym_reduce true
+hybrid_method       none
+
+solve_type      petsc-peierls-gmres
+rtol            1e-60
+abs_tol         1e-8
+dtol            1e8
+max_its         5000
+gmres_restart   100
+
+sweep_solve     hessenberg
+sweep_pattern   wavefront
+
+output_af       true
+output_sd       true
+output_plot     false
+output_mem      true
+output_log      true
+output_init     false
+output_steps    true
+
